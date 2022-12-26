@@ -6,14 +6,14 @@
     },
     {
       "id": 3,
-      "nome": "adasdtestesss"
+      "nome": "teste"
     }
   ],
   "tarefas": [
     {
       "id": 1,
       "duracaoEmSegundos": 120,
-      "descricao": "a configuração do ambientes770",
+      "descricao": "a configuração do ambientes7",
       "projeto": {
         "id": 1,
         "nome": "Alura Tracker"
@@ -21,7 +21,7 @@
     },
     {
       "duracaoEmSegundos": 1,
-      "descricao": "teste ",
+      "descricao": "teste",
       "projeto": {
         "nome": "adasd",
         "id": 2
