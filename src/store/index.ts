@@ -1,37 +1,29 @@
 import { INotificacao } from "@/interfaces/INotificacao";
-import IProjeto from "@/interfaces/IProjeto";
 import { InjectionKey } from "vue";
 import { createStore, Store, useStore as vuexUseStore } from "vuex";
-import { ADICIONA_PROJETO, ALTERA_PROJETO, EXCLUIR_PROJETO, NOTIFICAR } from "./tipo_mutacoes";
+import { ALTERAR_TAREFA, CADASTRAR_TAREFAS, OBTER_TAREFAS } from "./tipo_acoes";
+import { ADICIONA_TAREFAS, ALTERA_TAREFA, DEFINIR_TAREFAS, NOTIFICAR } from "./tipo_mutacoes";
+import http from '@/http'
+import ITarefa from "@/interfaces/ITarefa";
+import { EstadoProjeto, projeto } from "./modulos/projeto";
 
-interface Estado {
-    projetos: IProjeto[],
-    notificacoes: INotificacao[]
+export interface Estado {
+    tarefas: ITarefa[]
+    notificacoes: INotificacao[],
+    projeto: EstadoProjeto
 }
 
 export const key: InjectionKey<Store<Estado>> = Symbol()
 
 export const store = createStore<Estado>({
     state: {
-        projetos: [],
-        notificacoes: []
+        tarefas: [],
+        notificacoes: [],
+        projeto: {
+            projetos: []
+        }
     },
-    mutations: {
-        [ADICIONA_PROJETO](state, nomeDoProjeto: string){
-            const projeto = {
-                id: new Date().toISOString(),
-                nome: nomeDoProjeto
-            } as IProjeto
-
-            state.projetos.push(projeto)
-        },
-        [ALTERA_PROJETO](state, projeto: IProjeto){
-            const index = state.projetos.findIndex(proj => proj.id == projeto.id)
-            state.projetos[index] = projeto
-        },
-        [EXCLUIR_PROJETO](state, id: string){
-            state.projetos = state.projetos.filter(proj => proj.id != id)
-        },
+    mutations: {        
         [NOTIFICAR](state, novaNotificacao: INotificacao){
             novaNotificacao.id = new Date().getTime()
 
@@ -40,8 +32,34 @@ export const store = createStore<Estado>({
             setTimeout(() => {
                 state.notificacoes = state.notificacoes.filter(not => not.id != novaNotificacao.id)
             }, 3000)
-        }
-
+        },        
+        [ADICIONA_TAREFAS](state, tarefa: ITarefa){            
+            state.tarefas.push(tarefa)
+        },
+        [DEFINIR_TAREFAS](state, tarefas: ITarefa[]){
+            state.tarefas = tarefas
+        },
+        [ALTERA_TAREFA](state, tarefa: ITarefa){
+            const index = state.tarefas.findIndex(taref => taref.id == tarefa.id)
+            state.tarefas[index] = tarefa
+        },
+    },
+    actions: {        
+        [OBTER_TAREFAS]({ commit }){
+            http.get('tarefas')
+                .then(resposta => commit(DEFINIR_TAREFAS, resposta.data))
+        },
+        [CADASTRAR_TAREFAS]({ commit }, tarefa: ITarefa){
+            return http.post('tarefas', tarefa)
+                .then(resposta => commit(ADICIONA_TAREFAS, resposta.data))
+        },
+        [ALTERAR_TAREFA]({ commit }, tarefa: ITarefa){
+            return http.put(`tarefas/${tarefa.id}`, tarefa)   
+                .then(() => commit(ALTERA_TAREFA, tarefa))
+        },
+    },
+    modules:{
+        projeto
     }
 })
 
