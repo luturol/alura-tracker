@@ -14,6 +14,13 @@ start server:
 json-server --watch db.json
 ```
 
+if it not works, try this:
+
+```
+npx json-server --watch db.json
+```
+
+
 ## Project setup
 
 ```

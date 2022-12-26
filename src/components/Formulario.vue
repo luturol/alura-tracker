@@ -2,31 +2,27 @@
     <div class="box formulario">
         <div class="columns">
             <div class="column is-6" role="form" aria-label="Fomulário para criação de uma nova tarefa">
-                <input type="text" class="input" placeholder="Qual tarefa você deseja iniciar?" v-model="descricao" />                            
+                <input type="text" class="input" placeholder="Qual tarefa você deseja iniciar?" v-model="descricao" />
             </div>
             <div class="column is-2">
                 <div class="select">
                     <select v-model="idProjeto">
                         <option value="">Selecione o projeto</option>
-                        <option
-                            :value="projeto.id"
-                            v-for="projeto in projetos"
-                            :key="projeto.id"
-                        >
-                            {{projeto.nome}}
+                        <option :value="projeto.id" v-for="projeto in projetos" :key="projeto.id">
+                            {{ projeto.nome }}
                         </option>
                     </select>
                 </div>
             </div>
             <div class="column">
-                <TemporizadorTarefa @aoTemporizadorFinalizado="finalizarTarefa"/>
+                <TemporizadorTarefa @aoTemporizadorFinalizado="finalizarTarefa" />
             </div>
-        </div>                
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import TemporizadorTarefa from './Temporizador.vue'
 import { useStore } from 'vuex'
 
@@ -40,39 +36,41 @@ export default defineComponent({
     components: {
         TemporizadorTarefa
     },
-    data(){
-        return {
-            descricao: '',
-            idProjeto: ''
-        }
-    },
-    methods: {
-        finalizarTarefa(tempoDecorrido: number) : void{
-            const projeto = this.projetos.find(proj => proj.id == this.idProjeto)
-            if(!projeto) { 
-                this.store.commit(NOTIFICAR, {
+    setup(props, { emit }) {
+        const descricao = ref("")
+        const idProjeto = ref("")
+
+        const store = useStore(key)
+
+        const projetos =  computed(() => store.state.projeto.projetos)
+        
+        const finalizarTarefa = (tempoDecorrido: number): void => {
+            const projeto = projetos.value.find(proj => proj.id == idProjeto.value)
+            if (!projeto) {
+                store.commit(NOTIFICAR, {
                     titulo: 'Ops!',
                     texto: "Selecione um projeto antes de finalizar a tarefa!",
                     tipo: TipoNotificacao.FALHA,
                 })
-                
+
                 return
             }
 
-            this.$emit('aoSalvarTarefa', {
+            emit('aoSalvarTarefa', {
                 duracaoEmSegundos: tempoDecorrido,
-                descricao: this.descricao,
-                projeto: this.projetos.find(proj => proj.id == this.idProjeto)
+                descricao: descricao.value,
+                projeto: projetos.value.find(proj => proj.id == idProjeto.value)
             })
-            
-            this.descricao = ''
+
+            descricao.value = ''
         }
-    },
-    setup(){
-        const store = useStore(key)
+        
         return {
+            descricao,
+            idProjeto,
             store,
-            projetos: computed(() => store.state.projeto.projetos)
+            projetos,
+            finalizarTarefa
         }
     }
 })

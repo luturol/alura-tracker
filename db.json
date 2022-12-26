@@ -5,8 +5,8 @@
       "id": 2
     },
     {
-      "nome": "adasdteste",
-      "id": 3
+      "id": 3,
+      "nome": "adasdtestesss"
     }
   ],
   "tarefas": [
@@ -18,6 +18,24 @@
         "id": 1,
         "nome": "Alura Tracker"
       }
+    },
+    {
+      "duracaoEmSegundos": 1,
+      "descricao": "teste ",
+      "projeto": {
+        "nome": "adasd",
+        "id": 2
+      },
+      "id": 2
+    },
+    {
+      "duracaoEmSegundos": 3,
+      "descricao": "testando tarefas",
+      "projeto": {
+        "nome": "adasd",
+        "id": 2
+      },
+      "id": 3
     }
   ]
 }
